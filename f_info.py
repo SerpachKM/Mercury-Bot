@@ -1,3 +1,4 @@
+import pyautogui
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,6 +15,7 @@ link_counterparty = []
 counterparty_name = []
 num_repeats = 0
 input_counterparty = []
+chrome_settings = 'chrome://settings/content/popups?search=%D0%92%D1%81%D0%BF%D0%BB%D1%8B%D0%B2%D0%B0%D1%8E%D1%89%D0%B8%D0%B5+%D0%BE%D0%BA%D0%BD%D0%B0+%D0%B8+%D0%BF%D0%B5%D1%80%D0%B5%D0%B0%D0%B4%D1%80%D0%B5%D1%81%D0%B0%D1%86%D0%B8%D1%8F'
 found_links = []
 action = []
 counterarty_years = []
@@ -103,7 +105,7 @@ def info():
                 input_counterparty = [counterparty_name] * num_repeats
                 break
 
-            elif action == 5:
+            elif action == 5 or action == 6:
                 counterarty_years = input('Введите год выработки контрагента: ').strip()
                 num_rep = int(input("Сколько раз выполнить действия на странице?: "))
                 max_matches = int(input("Сколько совпадений обработать? (0 для обработки всех): "))
@@ -130,12 +132,46 @@ def connection():
 def open_chrome_with_debugging():
     try:
         akk = int(input('1 - Войти с помощью логина и пороля.\n2 - Войти через Госуслуги.\n -----------------> '))
+        zat = int(input('Программа работает в первый раз?.\n1 - Да.\n2 - Нет.\n-----------------> '))
 
-        subprocess.Popen(f'start cmd /c "{cmd_command}"', shell=True)
-        connection()
+        if zat == 1:
+            subprocess.Popen(f'start cmd /c "{cmd_command}"', shell=True)
+            time.sleep(2)
+            connection()
 
-        time.sleep(2)
-        driver.get(url)
+            time.sleep(2)
+            driver.get(chrome_settings)
+
+            time.sleep(2)
+            pyautogui.press('tab', 2, 1)
+            pyautogui.press('up')
+
+            time.sleep(2)
+            pyautogui.hotkey('alt', 'f4')
+            time.sleep(1)
+            pyautogui.hotkey('alt', 'f4')
+            time.sleep(1)
+            subprocess.Popen(f'start cmd /c "{cmd_command}"', shell=True)
+
+            time.sleep(2)
+            connection()
+
+            time.sleep(2)
+            driver.get(url)
+
+        elif zat == 2:
+            subprocess.Popen(f'start cmd /c "{cmd_command}"', shell=True)
+            time.sleep(2)
+            connection()
+
+            time.sleep(2)
+            driver.get(chrome_settings)
+            time.sleep(2)
+            pyautogui.press('tab', 10, 1)
+            pyautogui.press('up', 2, 1)
+
+            time.sleep(2)
+            driver.get(url)
 
         if akk == 1:
             time.sleep(2)
@@ -163,6 +199,7 @@ def open_chrome_with_debugging():
                 EC.element_to_be_clickable((By.CLASS_NAME, "btn.login-btn.btn-success"))
             )
             button.click()
+        
         elif akk == 2:
             log_pas = WebDriverWait(driver, 10).until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, 'a[href*="ESIARedirect"]'))
